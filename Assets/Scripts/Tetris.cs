@@ -6,13 +6,16 @@ public class Tetris : MonoBehaviour
 {
     public int columnas = 10;
     GameObject cuboJugador;
-
     public int tiempoMovimiento = 1;
-
+    public KeyCode derecha = KeyCode.RightArrow;
+    public KeyCode izquierda = KeyCode.LeftArrow;
+    public KeyCode abajo = KeyCode.DownArrow;
+    bool[,] posiciones;
 
     // Start is called before the first frame update
     void Start()
     {
+        posiciones = new bool[columnas, 20];
         // Tablero
         for (int i = 21; i > 0; i--)
         {
@@ -37,16 +40,26 @@ public class Tetris : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*if (Input.GetKey(KeyCode.RightArrow))
+        // Para que no traspase la pared ni las demás piezas
+        // Mover a derecha
+        if (Input.GetKeyUp(derecha) && cuboJugador.transform.position.x < columnas && !posiciones[(int)cuboJugador.transform.position.x, (int)cuboJugador.transform.position.y - 2])
         {
             cuboJugador.transform.position = new Vector3(cuboJugador.transform.position.x + 1, cuboJugador.transform.position.y, 0);
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+        // Mover a izquierda
+        if (Input.GetKeyUp(izquierda) && cuboJugador.transform.position.x > 1 && !posiciones[(int)cuboJugador.transform.position.x - 2, (int)cuboJugador.transform.position.y - 2])
         {
             cuboJugador.transform.position = new Vector3(cuboJugador.transform.position.x - 1, cuboJugador.transform.position.y, 0);
-        }*/
+        }
+        // Mover abajo
+        if (Input.GetKeyUp(abajo) && cuboJugador.transform.position.y > 2 && !posiciones[(int)cuboJugador.transform.position.x - 1, (int)cuboJugador.transform.position.y - 3])
+        {
+            cuboJugador.transform.position = new Vector3(cuboJugador.transform.position.x, cuboJugador.transform.position.y - 1, 0);
+        }
+
     }
 
+    // Crear pieza
     void SpawnPieza()
     {
         cuboJugador = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -56,18 +69,18 @@ public class Tetris : MonoBehaviour
 
     IEnumerator CaerPieza()
     {
-        while (cuboJugador.transform.position.y != 2)
+        while (!posiciones[(int)cuboJugador.transform.position.x - 1, (int)cuboJugador.transform.position.y - 3])
         {
             cuboJugador.transform.position = new Vector3(cuboJugador.transform.position.x, cuboJugador.transform.position.y - 1, 0);
-            if (Input.GetKey(KeyCode.RightArrow))
-            {
-                cuboJugador.transform.position = new Vector3(cuboJugador.transform.position.x + 1, cuboJugador.transform.position.y, 0);
-            }
-            if (Input.GetKey(KeyCode.LeftArrow))
-            {
-                cuboJugador.transform.position = new Vector3(cuboJugador.transform.position.x - 1, cuboJugador.transform.position.y, 0);
-            }
             yield return new WaitForSeconds(tiempoMovimiento);
+            // Si llega al final, llamar a una nueva pieza
+            if (cuboJugador.transform.position.y == 2 || posiciones[(int)cuboJugador.transform.position.x - 1, (int)cuboJugador.transform.position.y - 3])
+            {
+                posiciones[(int)cuboJugador.transform.position.x - 1, (int)cuboJugador.transform.position.y - 2] = true;
+                Debug.Log($"Posición {cuboJugador.transform.position.x - 1}, {cuboJugador.transform.position.y - 2}");
+                SpawnPieza();
+                break;
+            }
         }
     }
 }
