@@ -1,5 +1,8 @@
+using Palmmedia.ReportGenerator.Core.Parser.Analysis;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Tetris : MonoBehaviour
@@ -78,9 +81,19 @@ public class Tetris : MonoBehaviour
             {
                 posiciones[(int)cuboJugador.transform.position.x - 1, (int)cuboJugador.transform.position.y - 2] = true;
                 Debug.Log($"Posición {cuboJugador.transform.position.x - 1}, {cuboJugador.transform.position.y - 2}");
+                LineaLlena((int)cuboJugador.transform.position.y - 2);
                 SpawnPieza();
                 break;
             }
+        }
+    }
+
+    // Comprobar si una línea está completa
+    void LineaLlena(int numeroDeLinea)
+    {
+        if (Enumerable.Range(0, posiciones.GetLength(0)).All(j => posiciones[j, numeroDeLinea]))
+        {
+            Debug.Log($"Línea {numeroDeLinea} llena");
         }
     }
 }
