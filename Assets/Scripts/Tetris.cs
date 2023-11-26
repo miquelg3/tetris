@@ -49,28 +49,57 @@ public class Tetris : MonoBehaviour
     void Update()
     {
         // Para que no traspase la pared ni las demás piezas
-        // Mover a derecha
-        //movimientos();
+        GameObject piezaDerecha = null;
+        float posicionMasDerecha = 0;
+
+        GameObject piezaIzquierda = null;
+        float posicionMasIzquierda = 100;
+
+        GameObject piezaAbajo = null;
+        float posicionMasAbajo = 30;
 
         foreach (var pieza in piezas)
         {
-            if (Input.GetKeyUp(derecha) && pieza.transform.position.x < columnas && !posiciones[(int)pieza.transform.position.x, (int)pieza.transform.position.y - 2])
+            if (pieza.transform.position.x > posicionMasDerecha)
+            {
+                posicionMasDerecha = pieza.transform.position.x;
+                piezaDerecha = pieza;
+            }
+            if (pieza.transform.position.x < posicionMasIzquierda)
+            {
+                posicionMasIzquierda = pieza.transform.position.x;
+                piezaIzquierda = pieza;
+            }
+            if (pieza.transform.position.y < posicionMasAbajo)
+            {
+                posicionMasAbajo = pieza.transform.position.y;
+                piezaAbajo = pieza;
+            }
+        }
+        // Mover derecha
+        if (Input.GetKeyUp(derecha) && piezaDerecha.transform.position.x < columnas && !posiciones[(int)piezaDerecha.transform.position.x, (int)piezaDerecha.transform.position.y - 2])
+        {
+            foreach (var pieza in piezas)
             {
                 pieza.transform.position = new Vector3(pieza.transform.position.x + 1, pieza.transform.position.y, 0);
             }
-            // Mover a izquierda
-            if (Input.GetKeyUp(izquierda) && pieza.transform.position.x > 1 && !posiciones[(int)pieza.transform.position.x - 2, (int)pieza.transform.position.y - 2])
+        }
+        // Mover a izquierda
+        if (Input.GetKeyUp(izquierda) && piezaIzquierda.transform.position.x > 1 && !posiciones[(int)piezaIzquierda.transform.position.x - 2, (int)piezaIzquierda.transform.position.y - 2])
+        {
+            foreach (var pieza in piezas)
             {
                 pieza.transform.position = new Vector3(pieza.transform.position.x - 1, pieza.transform.position.y, 0);
             }
-            // Mover abajo
-            if (Input.GetKeyUp(abajo) && pieza.transform.position.y > 2 && !posiciones[(int)pieza.transform.position.x - 1, (int)pieza.transform.position.y - 3])
+        }
+        // Mover abajo
+        if (Input.GetKeyUp(abajo) && piezaAbajo.transform.position.y > 2 && !posiciones[(int)piezaAbajo.transform.position.x - 1, (int)piezaAbajo.transform.position.y - 3])
+        {
+            foreach (var pieza in piezas)
             {
                 pieza.transform.position = new Vector3(pieza.transform.position.x, pieza.transform.position.y - 1, 0);
             }
         }
-
-
     }
 
     // Crear pieza
@@ -133,33 +162,12 @@ public class Tetris : MonoBehaviour
         }
     }
 
-    void movimientos()
-    {
-        foreach(var pieza in piezas)
-        {
-            if (Input.GetKeyUp(derecha) && pieza.transform.position.x < columnas && !posiciones[(int)pieza.transform.position.x, (int)pieza.transform.position.y - 2])
-            {
-                pieza.transform.position = new Vector3(pieza.transform.position.x + 1, pieza.transform.position.y, 0);
-            }
-            // Mover a izquierda
-            if (Input.GetKeyUp(izquierda) && pieza.transform.position.x > 1 && !posiciones[(int)pieza.transform.position.x - 2, (int)pieza.transform.position.y - 2])
-            {
-                pieza.transform.position = new Vector3(pieza.transform.position.x - 1, pieza.transform.position.y, 0);
-            }
-            // Mover abajo
-            if (Input.GetKeyUp(abajo) && pieza.transform.position.y > 2 && !posiciones[(int)pieza.transform.position.x - 1, (int)pieza.transform.position.y - 3])
-            {
-                pieza.transform.position = new Vector3(pieza.transform.position.x, pieza.transform.position.y - 1, 0);
-            }
-        }
-    }
-
     bool poderIrAbajo()
     {
         foreach (var pieza in piezas)
         {
             int x = (int)pieza.transform.position.x - 1;
-            int y = (int)pieza.transform.position.y - 3;
+            int y = (int)pieza.transform.position.y - 2;
 
             if (y <= 0 || posiciones[x, y - 1])
             {
