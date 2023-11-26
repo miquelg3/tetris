@@ -14,14 +14,14 @@ public class Tetris : MonoBehaviour
     public KeyCode izquierda = KeyCode.LeftArrow;
     public KeyCode abajo = KeyCode.DownArrow;
     bool[,] posiciones;
-    GameObject[] pieza;
+    GameObject[] piezas = new GameObject[4];
 
     // Start is called before the first frame update
     void Start()
     {
         for (int x = 0; x < 4; x++)
         {
-            pieza[x] = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            piezas[x] = GameObject.CreatePrimitive(PrimitiveType.Cube);
         }
         posiciones = new bool[columnas, 20];
         // Tablero
@@ -50,20 +50,26 @@ public class Tetris : MonoBehaviour
     {
         // Para que no traspase la pared ni las demás piezas
         // Mover a derecha
-        if (Input.GetKeyUp(derecha) && cuboJugador.transform.position.x < columnas && !posiciones[(int)cuboJugador.transform.position.x, (int)cuboJugador.transform.position.y - 2])
+        //movimientos();
+
+        foreach (var pieza in piezas)
         {
-            cuboJugador.transform.position = new Vector3(cuboJugador.transform.position.x + 1, cuboJugador.transform.position.y, 0);
+            if (Input.GetKeyUp(derecha) && pieza.transform.position.x < columnas && !posiciones[(int)pieza.transform.position.x, (int)pieza.transform.position.y - 2])
+            {
+                pieza.transform.position = new Vector3(pieza.transform.position.x + 1, pieza.transform.position.y, 0);
+            }
+            // Mover a izquierda
+            if (Input.GetKeyUp(izquierda) && pieza.transform.position.x > 1 && !posiciones[(int)pieza.transform.position.x - 2, (int)pieza.transform.position.y - 2])
+            {
+                pieza.transform.position = new Vector3(pieza.transform.position.x - 1, pieza.transform.position.y, 0);
+            }
+            // Mover abajo
+            if (Input.GetKeyUp(abajo) && pieza.transform.position.y > 2 && !posiciones[(int)pieza.transform.position.x - 1, (int)pieza.transform.position.y - 3])
+            {
+                pieza.transform.position = new Vector3(pieza.transform.position.x, pieza.transform.position.y - 1, 0);
+            }
         }
-        // Mover a izquierda
-        if (Input.GetKeyUp(izquierda) && cuboJugador.transform.position.x > 1 && !posiciones[(int)cuboJugador.transform.position.x - 2, (int)cuboJugador.transform.position.y - 2])
-        {
-            cuboJugador.transform.position = new Vector3(cuboJugador.transform.position.x - 1, cuboJugador.transform.position.y, 0);
-        }
-        // Mover abajo
-        if (Input.GetKeyUp(abajo) && cuboJugador.transform.position.y > 2 && !posiciones[(int)cuboJugador.transform.position.x - 1, (int)cuboJugador.transform.position.y - 3])
-        {
-            cuboJugador.transform.position = new Vector3(cuboJugador.transform.position.x, cuboJugador.transform.position.y - 1, 0);
-        }
+
 
     }
 
@@ -96,7 +102,7 @@ public class Tetris : MonoBehaviour
 
     IEnumerator CaerPieza()
     {
-        while (!posiciones[(int)cuboJugador.transform.position.x - 1, (int)cuboJugador.transform.position.y - 3])
+        /*while (!posiciones[(int)cuboJugador.transform.position.x - 1, (int)cuboJugador.transform.position.y - 3])
         {
             cuboJugador.transform.position = new Vector3(cuboJugador.transform.position.x, cuboJugador.transform.position.y - 1, 0);
             yield return new WaitForSeconds(tiempoMovimiento);
@@ -109,7 +115,59 @@ public class Tetris : MonoBehaviour
                 SpawnPieza();
                 break;
             }
+        }*/
+
+        while (poderIrAbajo())
+        {
+            foreach (var pieza in piezas)
+            {
+                pieza.transform.position = new Vector3(pieza.transform.position.x, pieza.transform.position.y - 1, 0);
+            }
+            yield return new WaitForSeconds(tiempoMovimiento);
         }
+
+        foreach (var pieza in piezas)
+        {
+            posiciones[(int)pieza.transform.position.x - 1, (int)pieza.transform.position.y - 2] = true;
+            Debug.Log($"Posición {pieza.transform.position.x - 1}, {pieza.transform.position.y - 2}");
+        }
+    }
+
+    void movimientos()
+    {
+        foreach(var pieza in piezas)
+        {
+            if (Input.GetKeyUp(derecha) && pieza.transform.position.x < columnas && !posiciones[(int)pieza.transform.position.x, (int)pieza.transform.position.y - 2])
+            {
+                pieza.transform.position = new Vector3(pieza.transform.position.x + 1, pieza.transform.position.y, 0);
+            }
+            // Mover a izquierda
+            if (Input.GetKeyUp(izquierda) && pieza.transform.position.x > 1 && !posiciones[(int)pieza.transform.position.x - 2, (int)pieza.transform.position.y - 2])
+            {
+                pieza.transform.position = new Vector3(pieza.transform.position.x - 1, pieza.transform.position.y, 0);
+            }
+            // Mover abajo
+            if (Input.GetKeyUp(abajo) && pieza.transform.position.y > 2 && !posiciones[(int)pieza.transform.position.x - 1, (int)pieza.transform.position.y - 3])
+            {
+                pieza.transform.position = new Vector3(pieza.transform.position.x, pieza.transform.position.y - 1, 0);
+            }
+        }
+    }
+
+    bool poderIrAbajo()
+    {
+        foreach (var pieza in piezas)
+        {
+            int x = (int)pieza.transform.position.x - 1;
+            int y = (int)pieza.transform.position.y - 3;
+
+            if (y <= 0 || posiciones[x, y - 1])
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // Comprobar si una línea está completa
@@ -121,44 +179,44 @@ public class Tetris : MonoBehaviour
         }
     }
 
-    // Pieza s
+    // Piezas
     void SpawnS()
     {
-        pieza[0].transform.position = new Vector3(columnas / 2 - 1, 22, 0);
-        pieza[1].transform.position = new Vector3(columnas / 2, 22, 0);
-        pieza[2].transform.position = new Vector3(columnas / 2, 21, 0);
-        pieza[3].transform.position = new Vector3(columnas / 2 + 1, 21, 0);
+        piezas[0].transform.position = new Vector3(columnas / 2 - 1, 22, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2, 22, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2, 21, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2 + 1, 21, 0);
     }
 
     void SpawnI()
     {
-        pieza[0].transform.position = new Vector3(columnas / 2, 23, 0);
-        pieza[1].transform.position = new Vector3(columnas / 2, 22, 0);
-        pieza[2].transform.position = new Vector3(columnas / 2, 21, 0);
-        pieza[3].transform.position = new Vector3(columnas / 2, 20, 0);
+        piezas[0].transform.position = new Vector3(columnas / 2, 23, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2, 22, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2, 21, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2, 20, 0);
     }
 
     void SpawnL()
     {
-        pieza[0].transform.position = new Vector3(columnas / 2, 23, 0);
-        pieza[1].transform.position = new Vector3(columnas / 2, 22, 0);
-        pieza[2].transform.position = new Vector3(columnas / 2, 21, 0);
-        pieza[3].transform.position = new Vector3(columnas / 2 + 1, 21, 0);
+        piezas[0].transform.position = new Vector3(columnas / 2, 23, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2, 22, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2, 21, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2 + 1, 21, 0);
     }
 
     void SpawnT()
     {
-        pieza[0].transform.position = new Vector3(columnas / 2 - 1, 22, 0);
-        pieza[1].transform.position = new Vector3(columnas / 2, 22, 0);
-        pieza[2].transform.position = new Vector3(columnas / 2 + 1, 22, 0);
-        pieza[3].transform.position = new Vector3(columnas / 2, 21, 0);
+        piezas[0].transform.position = new Vector3(columnas / 2 - 1, 22, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2, 22, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2 + 1, 22, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2, 21, 0);
     }
 
     void SpawnO()
     {
-        pieza[0].transform.position = new Vector3(columnas / 2 - 1, 22, 0);
-        pieza[1].transform.position = new Vector3(columnas / 2, 22, 0);
-        pieza[2].transform.position = new Vector3(columnas / 2 - 1, 21, 0);
-        pieza[3].transform.position = new Vector3(columnas / 2, 21, 0);
+        piezas[0].transform.position = new Vector3(columnas / 2 - 1, 22, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2, 22, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2 - 1, 21, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2, 21, 0);
     }
 }
