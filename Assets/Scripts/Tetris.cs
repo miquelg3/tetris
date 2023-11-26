@@ -14,10 +14,15 @@ public class Tetris : MonoBehaviour
     public KeyCode izquierda = KeyCode.LeftArrow;
     public KeyCode abajo = KeyCode.DownArrow;
     bool[,] posiciones;
+    GameObject[] pieza;
 
     // Start is called before the first frame update
     void Start()
     {
+        for (int x = 0; x < 4; x++)
+        {
+            pieza[x] = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        }
         posiciones = new bool[columnas, 20];
         // Tablero
         for (int i = 21; i > 0; i--)
@@ -65,8 +70,27 @@ public class Tetris : MonoBehaviour
     // Crear pieza
     void SpawnPieza()
     {
-        cuboJugador = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        cuboJugador.transform.position = new Vector3(columnas / 2, 21, 0);
+        /*cuboJugador = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        cuboJugador.transform.position = new Vector3(columnas / 2, 21, 0);*/
+        int numPieza = UnityEngine.Random.Range(0, 4);
+        switch (numPieza)
+        {
+            case 0:
+                SpawnS();
+                break;
+            case 1:
+                SpawnI(); 
+                break;
+            case 2:
+                SpawnL();
+                break;
+            case 3:
+                SpawnT();
+                break;
+            case 4:
+                SpawnO();
+                break;
+        }
         StartCoroutine(CaerPieza());
     }
 
@@ -95,5 +119,46 @@ public class Tetris : MonoBehaviour
         {
             Debug.Log($"Línea {numeroDeLinea} llena");
         }
+    }
+
+    // Pieza s
+    void SpawnS()
+    {
+        pieza[0].transform.position = new Vector3(columnas / 2 - 1, 22, 0);
+        pieza[1].transform.position = new Vector3(columnas / 2, 22, 0);
+        pieza[2].transform.position = new Vector3(columnas / 2, 21, 0);
+        pieza[3].transform.position = new Vector3(columnas / 2 + 1, 21, 0);
+    }
+
+    void SpawnI()
+    {
+        pieza[0].transform.position = new Vector3(columnas / 2, 23, 0);
+        pieza[1].transform.position = new Vector3(columnas / 2, 22, 0);
+        pieza[2].transform.position = new Vector3(columnas / 2, 21, 0);
+        pieza[3].transform.position = new Vector3(columnas / 2, 20, 0);
+    }
+
+    void SpawnL()
+    {
+        pieza[0].transform.position = new Vector3(columnas / 2, 23, 0);
+        pieza[1].transform.position = new Vector3(columnas / 2, 22, 0);
+        pieza[2].transform.position = new Vector3(columnas / 2, 21, 0);
+        pieza[3].transform.position = new Vector3(columnas / 2 + 1, 21, 0);
+    }
+
+    void SpawnT()
+    {
+        pieza[0].transform.position = new Vector3(columnas / 2 - 1, 22, 0);
+        pieza[1].transform.position = new Vector3(columnas / 2, 22, 0);
+        pieza[2].transform.position = new Vector3(columnas / 2 + 1, 22, 0);
+        pieza[3].transform.position = new Vector3(columnas / 2, 21, 0);
+    }
+
+    void SpawnO()
+    {
+        pieza[0].transform.position = new Vector3(columnas / 2 - 1, 22, 0);
+        pieza[1].transform.position = new Vector3(columnas / 2, 22, 0);
+        pieza[2].transform.position = new Vector3(columnas / 2 - 1, 21, 0);
+        pieza[3].transform.position = new Vector3(columnas / 2, 21, 0);
     }
 }
