@@ -155,11 +155,15 @@ public class Tetris : MonoBehaviour
             yield return new WaitForSeconds(tiempoMovimiento);
         }
 
+        // Llega abajo, guarda posición y spawnea nueva pieza
         foreach (var pieza in piezas)
         {
             posiciones[(int)pieza.transform.position.x - 1, (int)pieza.transform.position.y - 2] = true;
+            GameObject nuevaPosicion = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            nuevaPosicion.transform.position = pieza.transform.position;
             Debug.Log($"Posición {pieza.transform.position.x - 1}, {pieza.transform.position.y - 2}");
         }
+        SpawnPieza();
     }
 
     bool poderIrAbajo()
@@ -198,18 +202,18 @@ public class Tetris : MonoBehaviour
 
     void SpawnI()
     {
-        piezas[0].transform.position = new Vector3(columnas / 2, 23, 0);
-        piezas[1].transform.position = new Vector3(columnas / 2, 22, 0);
-        piezas[2].transform.position = new Vector3(columnas / 2, 21, 0);
-        piezas[3].transform.position = new Vector3(columnas / 2, 20, 0);
+        piezas[0].transform.position = new Vector3(columnas / 2, 22, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2, 21, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2, 20, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2, 19, 0);
     }
 
     void SpawnL()
     {
-        piezas[0].transform.position = new Vector3(columnas / 2, 23, 0);
-        piezas[1].transform.position = new Vector3(columnas / 2, 22, 0);
-        piezas[2].transform.position = new Vector3(columnas / 2, 21, 0);
-        piezas[3].transform.position = new Vector3(columnas / 2 + 1, 21, 0);
+        piezas[0].transform.position = new Vector3(columnas / 2, 22, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2, 21, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2, 20, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2 + 1, 20, 0);
     }
 
     void SpawnT()
