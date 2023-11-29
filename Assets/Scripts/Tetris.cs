@@ -13,6 +13,7 @@ public class Tetris : MonoBehaviour
     public KeyCode derecha = KeyCode.RightArrow;
     public KeyCode izquierda = KeyCode.LeftArrow;
     public KeyCode abajo = KeyCode.DownArrow;
+    public KeyCode rotar = KeyCode.Space;
     bool[,] posiciones;
     GameObject[] piezas = new GameObject[4];
 
@@ -53,11 +54,12 @@ public class Tetris : MonoBehaviour
         float posicionMasDerecha = 0;
 
         GameObject piezaIzquierda = null;
-        float posicionMasIzquierda = 100;
+        float posicionMasIzquierda = columnas;
 
         GameObject piezaAbajo = null;
         float posicionMasAbajo = 30;
 
+        // Recoger pieza de cada extremo
         foreach (var pieza in piezas)
         {
             if (pieza.transform.position.x > posicionMasDerecha)
@@ -100,13 +102,16 @@ public class Tetris : MonoBehaviour
                 pieza.transform.position = new Vector3(pieza.transform.position.x, pieza.transform.position.y - 1, 0);
             }
         }
+        // Rotar pieza
+        if (Input.GetKeyUp(rotar))
+        {
+            RotarPieza();
+        }
     }
 
     // Crear pieza
     void SpawnPieza()
     {
-        /*cuboJugador = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        cuboJugador.transform.position = new Vector3(columnas / 2, 21, 0);*/
         int numPieza = UnityEngine.Random.Range(0, 4);
         switch (numPieza)
         {
@@ -131,21 +136,6 @@ public class Tetris : MonoBehaviour
 
     IEnumerator CaerPieza()
     {
-        /*while (!posiciones[(int)cuboJugador.transform.position.x - 1, (int)cuboJugador.transform.position.y - 3])
-        {
-            cuboJugador.transform.position = new Vector3(cuboJugador.transform.position.x, cuboJugador.transform.position.y - 1, 0);
-            yield return new WaitForSeconds(tiempoMovimiento);
-            // Si llega al final, llamar a una nueva pieza
-            if (cuboJugador.transform.position.y == 2 || posiciones[(int)cuboJugador.transform.position.x - 1, (int)cuboJugador.transform.position.y - 3])
-            {
-                posiciones[(int)cuboJugador.transform.position.x - 1, (int)cuboJugador.transform.position.y - 2] = true;
-                Debug.Log($"Posición {cuboJugador.transform.position.x - 1}, {cuboJugador.transform.position.y - 2}");
-                LineaLlena((int)cuboJugador.transform.position.y - 2);
-                SpawnPieza();
-                break;
-            }
-        }*/
-
         while (poderIrAbajo())
         {
             foreach (var pieza in piezas)
@@ -178,7 +168,6 @@ public class Tetris : MonoBehaviour
                 return false;
             }
         }
-
         return true;
     }
 
@@ -230,5 +219,18 @@ public class Tetris : MonoBehaviour
         piezas[1].transform.position = new Vector3(columnas / 2, 22, 0);
         piezas[2].transform.position = new Vector3(columnas / 2 - 1, 21, 0);
         piezas[3].transform.position = new Vector3(columnas / 2, 21, 0);
+    }
+
+    void RotarPieza()
+    {
+        // Obtener el centro de rotación (usando el segundo cubo en este caso)
+        Vector3 pivot = piezas[1].transform.position;
+
+        // Rotar cada cubo alrededor del pivote
+        for (int i = 0; i < piezas.Length; i++)
+        {
+            Vector3 relativePos = piezas[i].transform.position - pivot;
+            piezas[i].transform.position = new Vector3(-relativePos.y + pivot.x, relativePos.x + pivot.y, 0);
+        }
     }
 }
