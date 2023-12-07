@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Tetris : MonoBehaviour
@@ -18,6 +19,7 @@ public class Tetris : MonoBehaviour
     
     bool[,] posiciones;
     GameObject[] piezas = new GameObject[4];
+    List<Pieza> todasLasPiezas = new List<Pieza>();
     private int colorNum;
 
     // Start is called before the first frame update
@@ -168,7 +170,9 @@ public class Tetris : MonoBehaviour
             GameObject nuevaPosicion = GameObject.CreatePrimitive(PrimitiveType.Cube);
             nuevaPosicion.transform.position = pieza.transform.position;
             nuevaPosicion.transform.GetComponent<Renderer>().material.color = colores[colorNum];
+            todasLasPiezas.Add(new Pieza(nuevaPosicion, (int)pieza.transform.position.x, (int)pieza.transform.position.y));
             Debug.LogWarning($"Posición {pieza.transform.position.x}, {pieza.transform.position.y}");
+            if (LineaLlena((int)pieza.transform.position.y)) break;
         }
         SpawnPieza();
     }
@@ -205,15 +209,6 @@ public class Tetris : MonoBehaviour
     {
         if (piezaAbajo.transform.position.y > 0 && !posiciones[(int)piezaAbajo.transform.position.x, (int)piezaAbajo.transform.position.y - 1]) return true;
         else return false;
-    }
-
-    // Comprobar si una línea está completa
-    void LineaLlena(int numeroDeLinea)
-    {
-        if (Enumerable.Range(0, posiciones.GetLength(0)).All(j => posiciones[j, numeroDeLinea]))
-        {
-            Debug.Log($"Línea {numeroDeLinea} llena");
-        }
     }
 
     // Piezas
@@ -283,5 +278,27 @@ public class Tetris : MonoBehaviour
             }
         }
         return resultado;
+    }
+
+    // Comprobar si una línea está completa
+    bool LineaLlena(int numeroDeLinea)
+    {
+        if (Enumerable.Range(0, posiciones.GetLength(0)).All(j => posiciones[j, numeroDeLinea]))
+        {
+            Debug.Log($"Línea {numeroDeLinea} llena");
+            foreach (Pieza pieza in todasLasPiezas)
+            {
+                pieza.bajarUnaFila();
+            }
+            for (int x = 0; x < columnas; x++)
+            {
+                for (int y = 1; y < 20; y++)
+                {
+                    posiciones[x, y] = posiciones[x, y - 1];
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }
