@@ -8,14 +8,17 @@ using UnityEngine;
 public class Tetris : MonoBehaviour
 {
     public int columnas = 10;
-    GameObject cuboJugador;
-    public int tiempoMovimiento = 1;
+    [Range(0,1)]
+    public float tiempoMovimiento = 1f;
     public KeyCode derecha = KeyCode.RightArrow;
     public KeyCode izquierda = KeyCode.LeftArrow;
     public KeyCode abajo = KeyCode.DownArrow;
     public KeyCode rotar = KeyCode.Space;
+    public Color[] colores = new Color[4];
+    
     bool[,] posiciones;
     GameObject[] piezas = new GameObject[4];
+    private int colorNum;
 
     // Start is called before the first frame update
     void Start()
@@ -95,7 +98,7 @@ public class Tetris : MonoBehaviour
             }
         }
         // Mover abajo
-        if (Input.GetKeyUp(abajo) && PoderIrAbajo(piezaAbajo))
+        if (Input.GetKeyUp(abajo) && PoderIrAbajoTecla(piezaAbajo))
         {
             foreach (var pieza in piezas)
             {
@@ -119,7 +122,8 @@ public class Tetris : MonoBehaviour
     // Crear pieza
     void SpawnPieza()
     {
-        int numPieza = UnityEngine.Random.Range(0, 4);
+        colorNum = UnityEngine.Random.Range(0, 4);
+        int numPieza = UnityEngine.Random.Range(0, 5);
         switch (numPieza)
         {
             case 0:
@@ -137,6 +141,10 @@ public class Tetris : MonoBehaviour
             case 4:
                 SpawnO();
                 break;
+        }
+        foreach (var pieza in piezas)
+        {
+            pieza.GetComponent<Renderer>().material.color = colores[colorNum];
         }
         StartCoroutine(CaerPieza());
     }
@@ -159,6 +167,7 @@ public class Tetris : MonoBehaviour
             posiciones[(int)pieza.transform.position.x, (int)pieza.transform.position.y] = true;
             GameObject nuevaPosicion = GameObject.CreatePrimitive(PrimitiveType.Cube);
             nuevaPosicion.transform.position = pieza.transform.position;
+            nuevaPosicion.transform.GetComponent<Renderer>().material.color = colores[colorNum];
             Debug.LogWarning($"Posición {pieza.transform.position.x}, {pieza.transform.position.y}");
         }
         SpawnPieza();
@@ -181,19 +190,20 @@ public class Tetris : MonoBehaviour
 
     bool PoderIrDerecha(GameObject piezaDerecha)
     {
-        if (piezaDerecha.transform.position.x < columnas && !posiciones[(int)piezaDerecha.transform.position.x + 1, (int)piezaDerecha.transform.position.y]) return true;
+        if (piezaDerecha.transform.position.x == columnas - 1) return false;
+        else if (piezaDerecha.transform.position.x < columnas && !posiciones[(int)piezaDerecha.transform.position.x + 1, (int)piezaDerecha.transform.position.y]) return true;
         else return false;
     }
 
     bool PoderIrIzquierda(GameObject piezaIzquierda)
     {
-        if (piezaIzquierda.transform.position.x > 1 && !posiciones[(int)piezaIzquierda.transform.position.x - 1, (int)piezaIzquierda.transform.position.y]) return true;
+        if (piezaIzquierda.transform.position.x > 0 && !posiciones[(int)piezaIzquierda.transform.position.x - 1, (int)piezaIzquierda.transform.position.y]) return true;
         else return false;
     }
 
-    bool PoderIrAbajo(GameObject piezaAbajo)
+    bool PoderIrAbajoTecla(GameObject piezaAbajo)
     {
-        if (piezaAbajo.transform.position.y > 2 && !posiciones[(int)piezaAbajo.transform.position.x, (int)piezaAbajo.transform.position.y - 1]) return true;
+        if (piezaAbajo.transform.position.y > 0 && !posiciones[(int)piezaAbajo.transform.position.x, (int)piezaAbajo.transform.position.y - 1]) return true;
         else return false;
     }
 
@@ -266,7 +276,7 @@ public class Tetris : MonoBehaviour
         bool resultado = true;
         for (int i = 0; i < posicionesAlRotar.Length; i++)
         {
-            if (posicionesAlRotar[i].x <= 0 || posicionesAlRotar[i].y <= 0 || posicionesAlRotar[i].x >= columnas || !posiciones[(int)posicionesAlRotar[i].x, (int)posicionesAlRotar[i].y])
+            if (posicionesAlRotar[i].x <= 0 || posicionesAlRotar[i].y <= 0 || posicionesAlRotar[i].x >= columnas || posiciones[(int)posicionesAlRotar[i].x, (int)posicionesAlRotar[i].y])
             {
                 resultado = false;
                 break;

@@ -328,6 +328,11 @@ MonoBehaviour:
   izquierda: 276
   abajo: 274
   rotar: 32
+  colores:
+  - {r: 0, g: 0.16129017, b: 1, a: 0}
+  - {r: 1, g: 0, b: 0, a: 0}
+  - {r: 0.002853713, g: 0.9433962, b: 0, a: 0}
+  - {r: 1, g: 0.90410167, b: 0, a: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
