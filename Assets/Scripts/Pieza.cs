@@ -26,10 +26,10 @@ public class Pieza : MonoBehaviour
         this.fila = fila;
     }
 
-    public void bajarUnaFila()
+    public void bajarUnaFila(int numeroLinea)
     {
         Debug.Log($"Columna {columna}, fila {fila}");
-        if (fila == 0)
+        if (fila == numeroLinea)
         {
             Destroy(pieza);
         }

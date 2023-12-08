@@ -22,6 +22,7 @@ public class Tetris : MonoBehaviour
     List<Pieza> todasLasPiezas = new List<Pieza>();
     private int colorNum;
     bool encontradaLineaLlena;
+    int cantidadLineasLlenas;
 
     // Start is called before the first frame update
     void Start()
@@ -181,11 +182,25 @@ public class Tetris : MonoBehaviour
                     Debug.LogWarning($"Posición {pieza.transform.position.x}, {pieza.transform.position.y}");
                 }
             }
-            for (int i = 0; i < 20; i++)
+            int lineaLlena = 0;
+            for (int i = 19; i >= 0; i--)
             {
-                if (LineaLlena(i)) encontradaLineaLlena = true;
+                if (LineaLlena(i))
+                {
+                    encontradaLineaLlena = true;
+                    lineaLlena = i;
+                    cantidadLineasLlenas++;
+                }
             }
-            if (encontradaLineaLlena) AjustarPosiciones(); encontradaLineaLlena = false;
+            if (encontradaLineaLlena)
+            {
+                for (int i = 0; i < cantidadLineasLlenas; i++)
+                {
+                    AjustarPosiciones(lineaLlena);
+                }
+            }
+            cantidadLineasLlenas = 0;
+            encontradaLineaLlena = false;
             SpawnPieza();
         }
     }
@@ -302,9 +317,12 @@ public class Tetris : MonoBehaviour
             if (Enumerable.Range(0, posiciones.GetLength(0)).All(j => posiciones[j, numeroDeLinea]))
             {
                 Debug.Log($"Línea {numeroDeLinea} llena");
-                foreach (Pieza pieza in todasLasPiezas)
+                for (int i = todasLasPiezas.Count - 1; i >= 0; i--)
                 {
-                    pieza.bajarUnaFila();
+                    if (todasLasPiezas[i].fila >= numeroDeLinea)
+                    {
+                        todasLasPiezas[i].bajarUnaFila(numeroDeLinea);
+                    }
                 }
                 return true;
             }
@@ -313,11 +331,11 @@ public class Tetris : MonoBehaviour
         return false;
     }
 
-    void AjustarPosiciones()
+    void AjustarPosiciones(int lineaLlena)
     {
         for (int x = 0; x < columnas; x++)
         {
-            for (int y = 1; y < 20; y++)
+            for (int y = lineaLlena + 1; y < 20; y++)
             {
                 posiciones[x, y - 1] = posiciones[x, y];
                 if (y == 19)
