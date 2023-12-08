@@ -21,6 +21,7 @@ public class Tetris : MonoBehaviour
     GameObject[] piezas = new GameObject[4];
     List<Pieza> todasLasPiezas = new List<Pieza>();
     private int colorNum;
+    bool encontradaLineaLlena;
 
     // Start is called before the first frame update
     void Start()
@@ -155,6 +156,7 @@ public class Tetris : MonoBehaviour
     {
         while (PoderIrAbajo())
         {
+            encontradaLineaLlena = false;
             foreach (var pieza in piezas)
             {
                 pieza.transform.position = new Vector3(pieza.transform.position.x, pieza.transform.position.y - 1, 0);
@@ -164,17 +166,28 @@ public class Tetris : MonoBehaviour
         }
 
         // Llega abajo, guarda posición y spawnea nueva pieza
-        foreach (var pieza in piezas)
+        if (!PoderIrAbajo())
         {
-            posiciones[(int)pieza.transform.position.x, (int)pieza.transform.position.y] = true;
-            GameObject nuevaPosicion = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            nuevaPosicion.transform.position = pieza.transform.position;
-            nuevaPosicion.transform.GetComponent<Renderer>().material.color = colores[colorNum];
-            todasLasPiezas.Add(new Pieza(nuevaPosicion, (int)pieza.transform.position.x, (int)pieza.transform.position.y));
-            Debug.LogWarning($"Posición {pieza.transform.position.x}, {pieza.transform.position.y}");
-            if (LineaLlena((int)pieza.transform.position.y)) break;
+            foreach (var pieza in piezas)
+            {
+                if (pieza.transform.position.y < 20)
+                {
+                    Debug.Log($"Posición X: {pieza.transform.position.x}, Posición Y: {pieza.transform.position.y}");
+                    posiciones[(int)pieza.transform.position.x, (int)pieza.transform.position.y] = true;
+                    GameObject nuevaPosicion = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    nuevaPosicion.transform.position = pieza.transform.position;
+                    nuevaPosicion.transform.GetComponent<Renderer>().material.color = colores[colorNum];
+                    todasLasPiezas.Add(new Pieza(nuevaPosicion, (int)pieza.transform.position.x, (int)pieza.transform.position.y));
+                    Debug.LogWarning($"Posición {pieza.transform.position.x}, {pieza.transform.position.y}");
+                }
+            }
+            for (int i = 0; i < 20; i++)
+            {
+                if (LineaLlena(i)) encontradaLineaLlena = true;
+            }
+            if (encontradaLineaLlena) AjustarPosiciones(); encontradaLineaLlena = false;
+            SpawnPieza();
         }
-        SpawnPieza();
     }
 
     bool PoderIrAbajo()
@@ -283,22 +296,36 @@ public class Tetris : MonoBehaviour
     // Comprobar si una línea está completa
     bool LineaLlena(int numeroDeLinea)
     {
-        if (Enumerable.Range(0, posiciones.GetLength(0)).All(j => posiciones[j, numeroDeLinea]))
+        Debug.Log("Numero de línea: " + numeroDeLinea);
+        if (numeroDeLinea >= 0 && numeroDeLinea < 20)
         {
-            Debug.Log($"Línea {numeroDeLinea} llena");
-            foreach (Pieza pieza in todasLasPiezas)
+            if (Enumerable.Range(0, posiciones.GetLength(0)).All(j => posiciones[j, numeroDeLinea]))
             {
-                pieza.bajarUnaFila();
-            }
-            for (int x = 0; x < columnas; x++)
-            {
-                for (int y = 1; y < 20; y++)
+                Debug.Log($"Línea {numeroDeLinea} llena");
+                foreach (Pieza pieza in todasLasPiezas)
                 {
-                    posiciones[x, y] = posiciones[x, y - 1];
+                    pieza.bajarUnaFila();
                 }
+                return true;
             }
-            return true;
+            return false;
         }
         return false;
     }
+
+    void AjustarPosiciones()
+    {
+        for (int x = 0; x < columnas; x++)
+        {
+            for (int y = 1; y < 20; y++)
+            {
+                posiciones[x, y - 1] = posiciones[x, y];
+                if (y == 19)
+                {
+                    posiciones[x, y] = false;
+                }
+            }
+        }
+    }
+
 }

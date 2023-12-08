@@ -323,7 +323,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   columnas: 11
-  tiempoMovimiento: 1
+  tiempoMovimiento: 0.5
   derecha: 275
   izquierda: 276
   abajo: 274
