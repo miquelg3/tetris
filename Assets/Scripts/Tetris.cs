@@ -8,12 +8,16 @@ using UnityEngine;
 
 public class Tetris : MonoBehaviour
 {
+    [Range(4, 20)]
     public int columnas = 10;
+    [Range(10, 22)]
+    public int altura = 20;
     [Range(0,1)]
     public float tiempoMovimiento = 1f;
     public KeyCode derecha = KeyCode.RightArrow;
     public KeyCode izquierda = KeyCode.LeftArrow;
     public KeyCode abajo = KeyCode.DownArrow;
+    public KeyCode transportar = KeyCode.UpArrow;
     public KeyCode rotar = KeyCode.Space;
     public Color[] colores = new Color[4];
     
@@ -23,6 +27,7 @@ public class Tetris : MonoBehaviour
     private int colorNum;
     bool encontradaLineaLlena;
     int cantidadLineasLlenas;
+    bool moviendo;
 
     // Start is called before the first frame update
     void Start()
@@ -31,9 +36,9 @@ public class Tetris : MonoBehaviour
         {
             piezas[x] = GameObject.CreatePrimitive(PrimitiveType.Cube);
         }
-        posiciones = new bool[columnas, 20];
+        posiciones = new bool[columnas, altura];
         // Tablero
-        for (int y = 19; y > - 2; y--)
+        for (int y = altura - 1; y > - 2; y--)
         {
             GameObject cuboTablero = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cuboTablero.transform.position = new Vector3(-1, y, 0);
@@ -64,7 +69,7 @@ public class Tetris : MonoBehaviour
         float posicionMasIzquierda = columnas;
 
         GameObject piezaAbajo = null;
-        float posicionMasAbajo = 30;
+        float posicionMasAbajo = altura;
 
         // Recoger pieza de cada extremo
         foreach (var pieza in piezas)
@@ -86,7 +91,7 @@ public class Tetris : MonoBehaviour
             }
         }
         // Mover derecha
-        if (Input.GetKeyUp(derecha) && PoderIrDerecha(piezaDerecha))
+        if (Input.GetKeyUp(derecha) && PoderIrDerecha(piezaDerecha) && !moviendo)
         {
             foreach (var pieza in piezas)
             {
@@ -94,7 +99,7 @@ public class Tetris : MonoBehaviour
             }
         }
         // Mover a izquierda
-        if (Input.GetKeyUp(izquierda) && PoderIrIzquierda(piezaIzquierda))
+        if (Input.GetKeyUp(izquierda) && PoderIrIzquierda(piezaIzquierda) && !moviendo)
         {
             foreach (var pieza in piezas)
             {
@@ -102,15 +107,28 @@ public class Tetris : MonoBehaviour
             }
         }
         // Mover abajo
-        if (Input.GetKeyUp(abajo) && PoderIrAbajoTecla(piezaAbajo))
+        if (Input.GetKeyUp(abajo) && PoderIrAbajoTecla(piezaAbajo) && PoderIrAbajo() && !moviendo)
         {
             foreach (var pieza in piezas)
             {
                 pieza.transform.position = new Vector3(pieza.transform.position.x, pieza.transform.position.y - 1, 0);
             }
         }
+        // Mover hasta el final
+        if (Input.GetKeyUp(transportar) && !moviendo)
+        {
+            moviendo = true;
+            while (PoderIrAbajo())
+            {
+                foreach (var pieza in piezas)
+                {
+                    pieza.transform.position = new Vector3(pieza.transform.position.x, pieza.transform.position.y - 1, 0);
+                }
+            }
+            moviendo = false;
+        }
         // Rotar pieza
-        if (Input.GetKeyUp(rotar))
+        if (Input.GetKeyUp(rotar) && !moviendo)
         {
             Vector3[] posicionesAlRotar = RotarPieza();
             if (PoderRotarPieza(posicionesAlRotar))
@@ -127,7 +145,7 @@ public class Tetris : MonoBehaviour
     void SpawnPieza()
     {
         colorNum = UnityEngine.Random.Range(0, 4);
-        int numPieza = UnityEngine.Random.Range(0, 5);
+        int numPieza = UnityEngine.Random.Range(0, 7);
         switch (numPieza)
         {
             case 0:
@@ -145,6 +163,12 @@ public class Tetris : MonoBehaviour
             case 4:
                 SpawnO();
                 break;
+            case 5:
+                SpawnLReversed();
+                break;
+            case 6:
+                SpawnSReversed();
+                break;
         }
         foreach (var pieza in piezas)
         {
@@ -158,11 +182,14 @@ public class Tetris : MonoBehaviour
         while (PoderIrAbajo())
         {
             encontradaLineaLlena = false;
+            moviendo = false;
             foreach (var pieza in piezas)
             {
+                moviendo = true;
                 pieza.transform.position = new Vector3(pieza.transform.position.x, pieza.transform.position.y - 1, 0);
                 Debug.Log($"Posición {pieza.transform.position.x}, {pieza.transform.position.y}");
             }
+            moviendo = false;
             yield return new WaitForSeconds(tiempoMovimiento);
         }
 
@@ -171,7 +198,7 @@ public class Tetris : MonoBehaviour
         {
             foreach (var pieza in piezas)
             {
-                if (pieza.transform.position.y < 20)
+                if (pieza.transform.position.y < altura)
                 {
                     Debug.Log($"Posición X: {pieza.transform.position.x}, Posición Y: {pieza.transform.position.y}");
                     posiciones[(int)pieza.transform.position.x, (int)pieza.transform.position.y] = true;
@@ -183,7 +210,7 @@ public class Tetris : MonoBehaviour
                 }
             }
             int lineaLlena = 0;
-            for (int i = 19; i >= 0; i--)
+            for (int i = altura - 1; i >= 0; i--)
             {
                 if (LineaLlena(i))
                 {
@@ -201,7 +228,10 @@ public class Tetris : MonoBehaviour
             }
             cantidadLineasLlenas = 0;
             encontradaLineaLlena = false;
-            SpawnPieza();
+            if (!posiciones[columnas / 2, altura - 1] || posiciones[columnas / 2, altura - 2])
+            {
+                SpawnPieza();
+            }
         }
     }
 
@@ -242,42 +272,58 @@ public class Tetris : MonoBehaviour
     // Piezas
     void SpawnS()
     {
-        piezas[0].transform.position = new Vector3(columnas / 2 - 1, 20, 0);
-        piezas[1].transform.position = new Vector3(columnas / 2, 20, 0);
-        piezas[2].transform.position = new Vector3(columnas / 2, 19, 0);
-        piezas[3].transform.position = new Vector3(columnas / 2 + 1, 19, 0);
+        piezas[0].transform.position = new Vector3(columnas / 2 - 1, altura, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2, altura, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2, altura - 1, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2 + 1, altura - 1, 0);
     }
 
     void SpawnI()
     {
-        piezas[0].transform.position = new Vector3(columnas / 2, 20, 0);
-        piezas[1].transform.position = new Vector3(columnas / 2, 19, 0);
-        piezas[2].transform.position = new Vector3(columnas / 2, 18, 0);
-        piezas[3].transform.position = new Vector3(columnas / 2, 17, 0);
+        piezas[0].transform.position = new Vector3(columnas / 2 - 2, altura, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2 - 1, altura, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2, altura, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2 + 1, altura, 0);
     }
 
     void SpawnL()
     {
-        piezas[0].transform.position = new Vector3(columnas / 2, 20, 0);
-        piezas[1].transform.position = new Vector3(columnas / 2, 19, 0);
-        piezas[2].transform.position = new Vector3(columnas / 2, 18, 0);
-        piezas[3].transform.position = new Vector3(columnas / 2 + 1, 18, 0);
+        piezas[0].transform.position = new Vector3(columnas / 2, altura, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2, altura - 1, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2, altura - 2, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2 + 1, altura - 2, 0);
     }
 
     void SpawnT()
     {
-        piezas[0].transform.position = new Vector3(columnas / 2 - 1, 20, 0);
-        piezas[1].transform.position = new Vector3(columnas / 2, 20, 0);
-        piezas[2].transform.position = new Vector3(columnas / 2 + 1, 20, 0);
-        piezas[3].transform.position = new Vector3(columnas / 2, 19, 0);
+        piezas[0].transform.position = new Vector3(columnas / 2 - 1, altura, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2, altura, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2 + 1, altura, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2, altura - 1, 0);
     }
 
     void SpawnO()
     {
-        piezas[0].transform.position = new Vector3(columnas / 2 - 1, 20, 0);
-        piezas[1].transform.position = new Vector3(columnas / 2, 20, 0);
-        piezas[2].transform.position = new Vector3(columnas / 2 - 1, 19, 0);
-        piezas[3].transform.position = new Vector3(columnas / 2, 19, 0);
+        piezas[0].transform.position = new Vector3(columnas / 2 - 1, altura, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2, altura, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2 - 1, altura - 1, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2, altura - 1, 0);
+    }
+
+    void SpawnLReversed()
+    {
+        piezas[0].transform.position = new Vector3(columnas / 2, altura, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2, altura - 1, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2, altura - 2, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2 - 1, altura - 2, 0);
+    }
+
+    void SpawnSReversed()
+    {
+        piezas[0].transform.position = new Vector3(columnas / 2 + 1, altura, 0);
+        piezas[1].transform.position = new Vector3(columnas / 2, altura, 0);
+        piezas[2].transform.position = new Vector3(columnas / 2, altura - 1, 0);
+        piezas[3].transform.position = new Vector3(columnas / 2 - 1, altura - 1, 0);
     }
 
     Vector3[] RotarPieza()
@@ -312,7 +358,7 @@ public class Tetris : MonoBehaviour
     bool LineaLlena(int numeroDeLinea)
     {
         Debug.Log("Numero de línea: " + numeroDeLinea);
-        if (numeroDeLinea >= 0 && numeroDeLinea < 20)
+        if (numeroDeLinea >= 0 && numeroDeLinea < altura)
         {
             if (Enumerable.Range(0, posiciones.GetLength(0)).All(j => posiciones[j, numeroDeLinea]))
             {
@@ -321,7 +367,7 @@ public class Tetris : MonoBehaviour
                 {
                     if (todasLasPiezas[i].fila >= numeroDeLinea)
                     {
-                        todasLasPiezas[i].bajarUnaFila(numeroDeLinea);
+                        todasLasPiezas[i].BajarUnaFila(numeroDeLinea);
                     }
                 }
                 return true;
@@ -335,10 +381,10 @@ public class Tetris : MonoBehaviour
     {
         for (int x = 0; x < columnas; x++)
         {
-            for (int y = lineaLlena + 1; y < 20; y++)
+            for (int y = lineaLlena + 1; y < altura; y++)
             {
                 posiciones[x, y - 1] = posiciones[x, y];
-                if (y == 19)
+                if (y == altura - 1)
                 {
                     posiciones[x, y] = false;
                 }

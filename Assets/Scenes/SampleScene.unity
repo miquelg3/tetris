@@ -322,8 +322,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58cac7ee64396ae428719a0473325d21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  columnas: 11
-  tiempoMovimiento: 0.5
+  columnas: 10
+  altura: 20
+  tiempoMovimiento: 0.25
   derecha: 275
   izquierda: 276
   abajo: 274

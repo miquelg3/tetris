@@ -26,7 +26,7 @@ public class Pieza : MonoBehaviour
         this.fila = fila;
     }
 
-    public void bajarUnaFila(int numeroLinea)
+    public void BajarUnaFila(int numeroLinea)
     {
         Debug.Log($"Columna {columna}, fila {fila}");
         if (fila == numeroLinea)
