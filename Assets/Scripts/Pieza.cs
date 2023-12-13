@@ -28,7 +28,7 @@ public class Pieza : MonoBehaviour
 
     public void BajarUnaFila(int numeroLinea)
     {
-        Debug.Log($"Columna {columna}, fila {fila}");
+        Debug.Log($"Eliminando o bajando columna {columna}, fila {fila}");
         if (fila == numeroLinea)
         {
             Destroy(pieza);
@@ -36,7 +36,10 @@ public class Pieza : MonoBehaviour
         else
         {
             fila--;
-            pieza.transform.position = new Vector3(columna, fila, 0);
+            if (pieza != null)
+            {
+                pieza.transform.position = new Vector3(columna, fila, 0);
+            }
         }
     }
 
