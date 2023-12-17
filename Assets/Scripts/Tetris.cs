@@ -21,6 +21,11 @@ public class Tetris : MonoBehaviour
     public KeyCode transportar = KeyCode.UpArrow;
     public KeyCode rotar = KeyCode.Space;
     public Color[] colores = new Color[4];
+    public AudioClip move;
+    public AudioClip clear;
+    public delegate void puntuacion(int n);
+    public static event puntuacion puntuacionActualizada;
+
     
     bool[,] posiciones;
     GameObject[] piezas = new GameObject[4];
@@ -31,10 +36,11 @@ public class Tetris : MonoBehaviour
     bool moviendo;
     int numPieza;
     bool gameOver;
-
+    int puntuacionPartida;
     // Start is called before the first frame update
     void Start()
     {
+        RecibirDificultad();
         for (int x = 0; x < 4; x++)
         {
             piezas[x] = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -61,6 +67,11 @@ public class Tetris : MonoBehaviour
         SpawnPieza();
     }
 
+    public void RecibirDificultad()
+    {
+        tiempoMovimiento = Dificultad.Instance.dificultad;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -80,6 +91,7 @@ public class Tetris : MonoBehaviour
         // Mover derecha
         if (Input.GetKeyUp(derecha) && PoderIrDerecha() && !moviendo)
         {
+            AudioSource.PlayClipAtPoint(move, Camera.main.transform.position);
             foreach (var pieza in piezas)
             {
                 pieza.transform.position = new Vector3(pieza.transform.position.x + 1, pieza.transform.position.y, pieza.transform.position.z);
@@ -88,6 +100,7 @@ public class Tetris : MonoBehaviour
         // Mover a izquierda
         if (Input.GetKeyUp(izquierda) && PoderIrIzquierda() && !moviendo)
         {
+            AudioSource.PlayClipAtPoint(move, Camera.main.transform.position);
             foreach (var pieza in piezas)
             {
                 pieza.transform.position = new Vector3(pieza.transform.position.x - 1, pieza.transform.position.y, pieza.transform.position.z);
@@ -479,13 +492,6 @@ public class Tetris : MonoBehaviour
             if (Enumerable.Range(0, posiciones.GetLength(0)).All(j => posiciones[j, numeroDeLinea]))
             {
                 Debug.Log($"Línea {numeroDeLinea} llena");
-                /*for (int i = todasLasPiezas.Count - 1; i >= 0; i--)
-                {
-                    if (todasLasPiezas[i].fila >= numeroDeLinea)
-                    {
-                        todasLasPiezas[i].BajarUnaFila(numeroDeLinea);
-                    }
-                }*/
                 foreach (var pieza in todasLasPiezas)
                 {
                     if (pieza.fila >= numeroDeLinea)
@@ -493,6 +499,9 @@ public class Tetris : MonoBehaviour
                         pieza.BajarUnaFila(numeroDeLinea);
                     }
                 }
+                puntuacionPartida += Mathf.RoundToInt(100f - tiempoMovimiento * 100);
+                puntuacionActualizada?.Invoke(puntuacionPartida);
+                tiempoMovimiento -= 0.05f;
                 return true;
             }
             return false;
