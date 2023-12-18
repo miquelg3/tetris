@@ -29,7 +29,7 @@ public class StartButton : MonoBehaviour
                 velocidad = 1f;
                 break;
             case 2:
-                velocidad = 0.75f;
+                velocidad = 0.66f;
                 break;
             case 3:
                 velocidad = 0.50f;

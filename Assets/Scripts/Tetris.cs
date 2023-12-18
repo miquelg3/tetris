@@ -40,6 +40,9 @@ public class Tetris : MonoBehaviour
     bool gameOver;
     int puntuacionPartida;
     int numPiezaEspecial = 1;
+    int proximaPieza = -1;
+    GameObject[] siguientesPiezas = new GameObject[4];
+    int proximoColor;
     // Start is called before the first frame update
     void Start()
     {
@@ -47,6 +50,7 @@ public class Tetris : MonoBehaviour
         for (int x = 0; x < 4; x++)
         {
             piezas[x] = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            siguientesPiezas[x] = GameObject.CreatePrimitive(PrimitiveType.Cube);
         }
         posiciones = new bool[columnas, altura];
         // Tablero
@@ -147,40 +151,86 @@ public class Tetris : MonoBehaviour
     // Crear pieza
     void SpawnPieza()
     {
-        colorNum = UnityEngine.Random.Range(0, colores.Length);
-        numPiezaEspecial = UnityEngine.Random.Range(0, 10);
-        if (numPiezaEspecial == 0)
+        // Primera vez que se ejecuta
+        if (proximaPieza == -1)
         {
-            SpawnSpecial();
+            colorNum = UnityEngine.Random.Range(0, colores.Length);
+            numPiezaEspecial = UnityEngine.Random.Range(0, 10);
+            if (numPiezaEspecial == 0)
+            {
+                SpawnSpecial();
+            }
+            else
+            {
+                numPieza = UnityEngine.Random.Range(0, 7);
+                switch (numPieza)
+                {
+                    case 0:
+                        SpawnS();
+                        break;
+                    case 1:
+                        SpawnI();
+                        break;
+                    case 2:
+                        SpawnL();
+                        break;
+                    case 3:
+                        SpawnT();
+                        break;
+                    case 4:
+                        SpawnO();
+                        break;
+                    case 5:
+                        SpawnLReversed();
+                        break;
+                    case 6:
+                        SpawnSReversed();
+                        break;
+                }
+            }
+            proximaPieza = UnityEngine.Random.Range(0, 7);
+            proximoColor = UnityEngine.Random.Range(0, colores.Length);
         }
         else
         {
-            numPieza = UnityEngine.Random.Range(0, 7);
-            switch (numPieza)
+            colorNum = proximoColor;
+            numPieza = proximaPieza;
+            numPiezaEspecial = UnityEngine.Random.Range(0, 10);
+            if (numPiezaEspecial == 0)
             {
-                case 0:
-                    SpawnS();
-                    break;
-                case 1:
-                    SpawnI();
-                    break;
-                case 2:
-                    SpawnL();
-                    break;
-                case 3:
-                    SpawnT();
-                    break;
-                case 4:
-                    SpawnO();
-                    break;
-                case 5:
-                    SpawnLReversed();
-                    break;
-                case 6:
-                    SpawnSReversed();
-                    break;
+                SpawnSpecial();
             }
+            else
+            {
+                switch (numPieza)
+                {
+                    case 0:
+                        SpawnS();
+                        break;
+                    case 1:
+                        SpawnI();
+                        break;
+                    case 2:
+                        SpawnL();
+                        break;
+                    case 3:
+                        SpawnT();
+                        break;
+                    case 4:
+                        SpawnO();
+                        break;
+                    case 5:
+                        SpawnLReversed();
+                        break;
+                    case 6:
+                        SpawnSReversed();
+                        break;
+                }
+            }
+            proximaPieza = UnityEngine.Random.Range(0, 7);
+            proximoColor = UnityEngine.Random.Range(0, colores.Length);
         }
+        MostrarProximasPiezas();
         if (!gameOver)
         {
             foreach (var pieza in piezas)
@@ -343,6 +393,14 @@ public class Tetris : MonoBehaviour
         else gameOver = true;
     }
 
+    void SpawnSNext()
+    {
+        siguientesPiezas[0].transform.position = new Vector3(columnas + 3, altura / 2 + 1, 0);
+        siguientesPiezas[1].transform.position = new Vector3(columnas + 4, altura / 2 + 1, 0);
+        siguientesPiezas[2].transform.position = new Vector3(columnas + 4, altura / 2, 0);
+        siguientesPiezas[3].transform.position = new Vector3(columnas + 5, altura / 2, 0);
+    }
+
     void SpawnI()
     {
         if (!posiciones[columnas / 2 - 2, altura - 1] && !posiciones[columnas / 2 - 1, altura - 1] && !posiciones[columnas / 2, altura - 1] && !posiciones[columnas / 2 + 1, altura - 1])
@@ -363,6 +421,14 @@ public class Tetris : MonoBehaviour
             }
         }
         else gameOver = true;
+    }
+
+    void SpawnINext()
+    {
+        siguientesPiezas[0].transform.position = new Vector3(columnas + 2, altura / 2 + 1, 0);
+        siguientesPiezas[1].transform.position = new Vector3(columnas + 3, altura / 2 + 1, 0);
+        siguientesPiezas[2].transform.position = new Vector3(columnas + 4, altura / 2 + 1, 0);
+        siguientesPiezas[3].transform.position = new Vector3(columnas + 5, altura / 2 + 1, 0);
     }
 
     void SpawnL()
@@ -387,6 +453,14 @@ public class Tetris : MonoBehaviour
         else gameOver = true;
     }
 
+    void SpawnLNext()
+    {
+        siguientesPiezas[0].transform.position = new Vector3(columnas + 4, altura / 2 + 1, 0);
+        siguientesPiezas[1].transform.position = new Vector3(columnas + 4, altura / 2, 0);
+        siguientesPiezas[2].transform.position = new Vector3(columnas + 4, altura / 2 - 1, 0);
+        siguientesPiezas[3].transform.position = new Vector3(columnas + 5, altura / 2 - 1, 0);
+    }
+
     void SpawnT()
     {
         if (!posiciones[columnas / 2 - 1, altura - 1] && !posiciones[columnas / 2, altura - 1] && !posiciones[columnas / 2 + 1, altura - 1] && !posiciones[columnas / 2, altura - 2])
@@ -407,6 +481,14 @@ public class Tetris : MonoBehaviour
             }
         }
         else gameOver = true;
+    }
+
+    void SpawnTNext()
+    {
+        siguientesPiezas[0].transform.position = new Vector3(columnas + 3, altura / 2 + 1, 0);
+        siguientesPiezas[1].transform.position = new Vector3(columnas + 4, altura / 2 + 1, 0);
+        siguientesPiezas[2].transform.position = new Vector3(columnas + 5, altura / 2 + 1, 0);
+        siguientesPiezas[3].transform.position = new Vector3(columnas + 4, altura / 2 + 2, 0);
     }
 
     void SpawnO()
@@ -431,6 +513,14 @@ public class Tetris : MonoBehaviour
         else gameOver = true;
     }
 
+    void SpawnONext()
+    {
+        siguientesPiezas[0].transform.position = new Vector3(columnas + 3, altura / 2 + 1, 0);
+        siguientesPiezas[1].transform.position = new Vector3(columnas + 4, altura / 2 + 1, 0);
+        siguientesPiezas[2].transform.position = new Vector3(columnas + 3, altura / 2, 0);
+        siguientesPiezas[3].transform.position = new Vector3(columnas + 4, altura / 2, 0);
+    }
+
     void SpawnLReversed()
     {
         if (!posiciones[columnas / 2, altura - 1] && !posiciones[columnas / 2, altura - 2] && !posiciones[columnas / 2, altura - 3] && !posiciones[columnas / 2 - 1, altura - 3])
@@ -451,6 +541,14 @@ public class Tetris : MonoBehaviour
             }
         }
         else gameOver = true;
+    }
+
+    void SpawnLReversedNext()
+    {
+        siguientesPiezas[0].transform.position = new Vector3(columnas + 4, altura / 2 + 1, 0);
+        siguientesPiezas[1].transform.position = new Vector3(columnas + 4, altura / 2, 0);
+        siguientesPiezas[2].transform.position = new Vector3(columnas + 4, altura / 2 - 1, 0);
+        siguientesPiezas[3].transform.position = new Vector3(columnas + 3, altura / 2 - 1, 0);
     }
 
     void SpawnSReversed()
@@ -475,6 +573,14 @@ public class Tetris : MonoBehaviour
         else gameOver = true;
     }
 
+    void SpawnSReversedNext()
+    {
+        siguientesPiezas[0].transform.position = new Vector3(columnas + 5, altura / 2 + 1, 0);
+        siguientesPiezas[1].transform.position = new Vector3(columnas + 4, altura / 2 + 1, 0);
+        siguientesPiezas[2].transform.position = new Vector3(columnas + 4, altura / 2, 0);
+        siguientesPiezas[3].transform.position = new Vector3(columnas + 3, altura / 2, 0);
+    }
+
     void SpawnSpecial()
     {
         if (!posiciones[columnas / 2, altura - 1])
@@ -483,6 +589,14 @@ public class Tetris : MonoBehaviour
             {
                 pieza.transform.position = new Vector3(columnas / 2, altura - 1, 0);
             }
+        }
+    }
+
+    void SpawnSpecialNext()
+    {
+        foreach (var pieza in siguientesPiezas)
+        {
+            pieza.transform.position = new Vector3(columnas + 4, altura / 2 + 2, 0);
         }
     }
 
@@ -505,7 +619,7 @@ public class Tetris : MonoBehaviour
         bool resultado = true;
         for (int i = 0; i < posicionesAlRotar.Length; i++)
         {
-            if (posicionesAlRotar[i].x <= 0 || posicionesAlRotar[i].y <= 0 || posicionesAlRotar[i].x >= columnas || posiciones[(int)posicionesAlRotar[i].x, (int)posicionesAlRotar[i].y])
+            if (posicionesAlRotar[i].x < 0 || posicionesAlRotar[i].y < 0 || posicionesAlRotar[i].x >= columnas || posicionesAlRotar[i].y >= altura || posiciones[(int)posicionesAlRotar[i].x, (int)posicionesAlRotar[i].y])
             {
                 resultado = false;
                 break;
@@ -571,6 +685,42 @@ public class Tetris : MonoBehaviour
         for (int y = 0; y < altura; y++)
         {
             posiciones[columna, y] = false;
+        }
+    }
+
+    void MostrarProximasPiezas()
+    {
+        switch (proximaPieza)
+        {
+            case 0:
+                SpawnSNext();
+                break;
+            case 1:
+                SpawnINext();
+                break;
+            case 2:
+                SpawnLNext();
+                break;
+            case 3:
+                SpawnTNext();
+                break;
+            case 4:
+                SpawnONext();
+                break;
+            case 5:
+                SpawnLReversedNext();
+                break;
+            case 6:
+                SpawnSReversedNext();
+                break;
+            case 7:
+                SpawnSpecialNext();
+                break;
+        }
+
+        foreach (var pieza in siguientesPiezas)
+        {
+            pieza.GetComponent<Renderer>().material.color = colores[proximoColor];
         }
     }
 
