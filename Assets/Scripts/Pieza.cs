@@ -43,4 +43,9 @@ public class Pieza : MonoBehaviour
         }
     }
 
+    public void EliminarPiezaColumna()
+    {
+        Destroy(pieza);
+    }
+
 }

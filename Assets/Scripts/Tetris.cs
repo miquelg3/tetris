@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Tetris : MonoBehaviour
 {
@@ -25,6 +26,7 @@ public class Tetris : MonoBehaviour
     public AudioClip clear;
     public delegate void puntuacion(int n);
     public static event puntuacion puntuacionActualizada;
+    public Image gameOverImage;
 
     
     bool[,] posiciones;
@@ -37,6 +39,7 @@ public class Tetris : MonoBehaviour
     int numPieza;
     bool gameOver;
     int puntuacionPartida;
+    int numPiezaEspecial = 1;
     // Start is called before the first frame update
     void Start()
     {
@@ -145,30 +148,38 @@ public class Tetris : MonoBehaviour
     void SpawnPieza()
     {
         colorNum = UnityEngine.Random.Range(0, colores.Length);
-        numPieza = UnityEngine.Random.Range(0, 7);
-        switch (numPieza)
+        numPiezaEspecial = UnityEngine.Random.Range(0, 10);
+        if (numPiezaEspecial == 0)
         {
-            case 0:
-                SpawnS();
-                break;
-            case 1:
-                SpawnI(); 
-                break;
-            case 2:
-                SpawnL();
-                break;
-            case 3:
-                SpawnT();
-                break;
-            case 4:
-                SpawnO();
-                break;
-            case 5:
-                SpawnLReversed();
-                break;
-            case 6:
-                SpawnSReversed();
-                break;
+            SpawnSpecial();
+        }
+        else
+        {
+            numPieza = UnityEngine.Random.Range(0, 7);
+            switch (numPieza)
+            {
+                case 0:
+                    SpawnS();
+                    break;
+                case 1:
+                    SpawnI();
+                    break;
+                case 2:
+                    SpawnL();
+                    break;
+                case 3:
+                    SpawnT();
+                    break;
+                case 4:
+                    SpawnO();
+                    break;
+                case 5:
+                    SpawnLReversed();
+                    break;
+                case 6:
+                    SpawnSReversed();
+                    break;
+            }
         }
         if (!gameOver)
         {
@@ -181,6 +192,7 @@ public class Tetris : MonoBehaviour
         else
         {
             Debug.Log("GameOver");
+            gameOverImage.gameObject.SetActive(true);
         }
     }
 
@@ -202,41 +214,49 @@ public class Tetris : MonoBehaviour
         // Llega abajo, guarda posición y spawnea nueva pieza
         if (!PoderIrAbajo())
         {
-            foreach (var pieza in piezas)
+            if (numPiezaEspecial == 0)
             {
-                if (pieza.transform.position.y < altura)
-                {
-                    Debug.Log($"Posición X: {pieza.transform.position.x}, Posición Y: {pieza.transform.position.y}");
-                    posiciones[(int)pieza.transform.position.x, (int)pieza.transform.position.y] = true;
-                    GameObject nuevaPosicion = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    nuevaPosicion.transform.position = pieza.transform.position;
-                    nuevaPosicion.transform.GetComponent<Renderer>().material.color = colores[colorNum];
-                    todasLasPiezas.Add(new Pieza(nuevaPosicion, (int)pieza.transform.position.x, (int)pieza.transform.position.y));
-                    Debug.LogWarning($"Posición {pieza.transform.position.x}, {pieza.transform.position.y}");
-                }
-            }
-            int lineaLlena = 0;
-            for (int i = altura - 1; i >= 0; i--)
-            {
-                if (LineaLlena(i))
-                {
-                    encontradaLineaLlena = true;
-                    lineaLlena = i;
-                    cantidadLineasLlenas++;
-                }
-            }
-            if (encontradaLineaLlena)
-            {
-                for (int i = 0; i < cantidadLineasLlenas; i++)
-                {
-                    AjustarPosiciones(lineaLlena);
-                }
-            }
-            cantidadLineasLlenas = 0;
-            encontradaLineaLlena = false;
-            if (!posiciones[columnas / 2, altura - 1] || posiciones[columnas / 2, altura - 2])
-            {
+                VaciarColumna((int)piezas[0].transform.position.x);
                 SpawnPieza();
+            }
+            else
+            {
+                foreach (var pieza in piezas)
+                {
+                    if (pieza.transform.position.y < altura)
+                    {
+                        Debug.Log($"Posición X: {pieza.transform.position.x}, Posición Y: {pieza.transform.position.y}");
+                        posiciones[(int)pieza.transform.position.x, (int)pieza.transform.position.y] = true;
+                        GameObject nuevaPosicion = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        nuevaPosicion.transform.position = pieza.transform.position;
+                        nuevaPosicion.transform.GetComponent<Renderer>().material.color = colores[colorNum];
+                        todasLasPiezas.Add(new Pieza(nuevaPosicion, (int)pieza.transform.position.x, (int)pieza.transform.position.y));
+                        Debug.LogWarning($"Posición {pieza.transform.position.x}, {pieza.transform.position.y}");
+                    }
+                }
+                int lineaLlena = 0;
+                for (int i = altura - 1; i >= 0; i--)
+                {
+                    if (LineaLlena(i))
+                    {
+                        encontradaLineaLlena = true;
+                        lineaLlena = i;
+                        cantidadLineasLlenas++;
+                    }
+                }
+                if (encontradaLineaLlena)
+                {
+                    for (int i = 0; i < cantidadLineasLlenas; i++)
+                    {
+                        AjustarPosiciones(lineaLlena);
+                    }
+                }
+                cantidadLineasLlenas = 0;
+                encontradaLineaLlena = false;
+                if (!posiciones[columnas / 2, altura - 1] || posiciones[columnas / 2, altura - 2])
+                {
+                    SpawnPieza();
+                }
             }
         }
     }
@@ -455,6 +475,17 @@ public class Tetris : MonoBehaviour
         else gameOver = true;
     }
 
+    void SpawnSpecial()
+    {
+        if (!posiciones[columnas / 2, altura - 1])
+        {
+            foreach (var pieza in piezas)
+            {
+                pieza.transform.position = new Vector3(columnas / 2, altura - 1, 0);
+            }
+        }
+    }
+
     Vector3[] RotarPieza()
     {
         // Obtener el centro de rotación
@@ -501,7 +532,7 @@ public class Tetris : MonoBehaviour
                 }
                 puntuacionPartida += Mathf.RoundToInt(100f - tiempoMovimiento * 100);
                 puntuacionActualizada?.Invoke(puntuacionPartida);
-                tiempoMovimiento -= 0.05f;
+                tiempoMovimiento -= 0.0125f;
                 return true;
             }
             return false;
@@ -524,6 +555,22 @@ public class Tetris : MonoBehaviour
                     posiciones[x, y] = false;
                 }
             }
+        }
+    }
+
+    void VaciarColumna(int columna)
+    {
+        foreach (var pieza in todasLasPiezas)
+        {
+            if (pieza.columna == columna)
+            {
+                Debug.Log($"Eliminando pieza en columna {columna}");
+                pieza.EliminarPiezaColumna();
+            }
+        }
+        for (int y = 0; y < altura; y++)
+        {
+            posiciones[columna, y] = false;
         }
     }
 
