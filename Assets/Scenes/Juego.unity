@@ -494,8 +494,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58cac7ee64396ae428719a0473325d21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  columnas: 12
-  altura: 20
+  columnas: 14
+  altura: 22
   tiempoMovimiento: 1
   profundidad: 0
   derecha: 275
@@ -508,8 +508,10 @@ MonoBehaviour:
   - {r: 1, g: 0, b: 0, a: 0}
   - {r: 0.002853713, g: 0.9433962, b: 0, a: 0}
   - {r: 1, g: 0.90410167, b: 0, a: 0}
-  move: {fileID: 8300000, guid: 8fb03e2943f67c947a860cc78402bf33, type: 3}
+  move: {fileID: 8300000, guid: 15cfd4024950171439273b001d6265b0, type: 3}
   clear: {fileID: 8300000, guid: 4930257fd1abba441b7d25d9bd38666d, type: 3}
+  rotate: {fileID: 8300000, guid: 8fb03e2943f67c947a860cc78402bf33, type: 3}
+  full: {fileID: 8300000, guid: 4930257fd1abba441b7d25d9bd38666d, type: 3}
   gameOverImage: {fileID: 1798102566}
 --- !u!82 &963194230
 AudioSource:
@@ -523,10 +525,10 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 5eade4e7904dae5478a47ab45bef9712, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.05
+  m_Volume: 0.15
   m_Pitch: 1
-  Loop: 0
-  Mute: 1
+  Loop: 1
+  Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128

@@ -24,6 +24,8 @@ public class Tetris : MonoBehaviour
     public Color[] colores = new Color[4];
     public AudioClip move;
     public AudioClip clear;
+    public AudioClip rotate;
+    public AudioClip full;
     public delegate void puntuacion(int n);
     public static event puntuacion puntuacionActualizada;
     public Image gameOverImage;
@@ -46,6 +48,8 @@ public class Tetris : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (columnas < 12) Camera.main.transform.Translate(Vector3.left * (12 - columnas) / 2);
+        if (columnas > 12) Camera.main.transform.Translate(Vector3.right * (columnas - 12) / 2);
         RecibirDificultad();
         for (int x = 0; x < 4; x++)
         {
@@ -140,6 +144,7 @@ public class Tetris : MonoBehaviour
             Vector3[] posicionesAlRotar = RotarPieza();
             if (PoderRotarPieza(posicionesAlRotar))
             {
+                AudioSource.PlayClipAtPoint(rotate, Camera.main.transform.position);
                 for (int i = 0; i < posicionesAlRotar.Length; i++)
                 {
                     piezas[i].transform.position = posicionesAlRotar[i];
@@ -300,6 +305,7 @@ public class Tetris : MonoBehaviour
                     {
                         AjustarPosiciones(lineaLlena);
                     }
+                    AudioSource.PlayClipAtPoint(full, Camera.main.transform.position);
                 }
                 cantidadLineasLlenas = 0;
                 encontradaLineaLlena = false;
