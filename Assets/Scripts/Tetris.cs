@@ -45,9 +45,11 @@ public class Tetris : MonoBehaviour
     int proximaPieza = -1;
     GameObject[] siguientesPiezas = new GameObject[4];
     int proximoColor;
+    System.Random random;
     // Start is called before the first frame update
     void Start()
     {
+        random = new System.Random();
         if (columnas < 12) Camera.main.transform.Translate(Vector3.left * (12 - columnas) / 2);
         if (columnas > 12) Camera.main.transform.Translate(Vector3.right * (columnas - 12) / 2);
         RecibirDificultad();
@@ -383,10 +385,10 @@ public class Tetris : MonoBehaviour
         {
             if (profundidad)
             {
-                piezas[0].transform.position = new Vector3(columnas / 2 - 1, altura - 1, 0);
-                piezas[1].transform.position = new Vector3(columnas / 2, altura - 1, 0.25f);
-                piezas[2].transform.position = new Vector3(columnas / 2, altura - 2, 0.25f);
-                piezas[3].transform.position = new Vector3(columnas / 2 + 1, altura - 2, 0);
+                piezas[0].transform.position = new Vector3(columnas / 2 - 1, altura - 1, (float)random.NextDouble());
+                piezas[1].transform.position = new Vector3(columnas / 2, altura - 1, (float)random.NextDouble());
+                piezas[2].transform.position = new Vector3(columnas / 2, altura - 2, (float)random.NextDouble());
+                piezas[3].transform.position = new Vector3(columnas / 2 + 1, altura - 2, (float)random.NextDouble());
             }
             else
             {
@@ -413,10 +415,10 @@ public class Tetris : MonoBehaviour
         {
             if (profundidad)
             {
-                piezas[0].transform.position = new Vector3(columnas / 2 - 2, altura - 1, 0);
-                piezas[1].transform.position = new Vector3(columnas / 2 - 1, altura - 1, 0.25f);
-                piezas[2].transform.position = new Vector3(columnas / 2, altura - 1, 0.25f);
-                piezas[3].transform.position = new Vector3(columnas / 2 + 1, altura - 1, 0);
+                piezas[0].transform.position = new Vector3(columnas / 2 - 2, altura - 1, (float)random.NextDouble());
+                piezas[1].transform.position = new Vector3(columnas / 2 - 1, altura - 1, (float)random.NextDouble());
+                piezas[2].transform.position = new Vector3(columnas / 2, altura - 1, (float)random.NextDouble());
+                piezas[3].transform.position = new Vector3(columnas / 2 + 1, altura - 1, (float)random.NextDouble());
             }
             else
             {
@@ -443,10 +445,10 @@ public class Tetris : MonoBehaviour
         {
             if (profundidad)
             {
-                piezas[0].transform.position = new Vector3(columnas / 2, altura - 1, 0);
-                piezas[1].transform.position = new Vector3(columnas / 2, altura - 2, 0.25f);
-                piezas[2].transform.position = new Vector3(columnas / 2, altura - 3, 0.25f);
-                piezas[3].transform.position = new Vector3(columnas / 2 + 1, altura - 3, 0);
+                piezas[0].transform.position = new Vector3(columnas / 2, altura - 1, (float)random.NextDouble());
+                piezas[1].transform.position = new Vector3(columnas / 2, altura - 2, (float)random.NextDouble());
+                piezas[2].transform.position = new Vector3(columnas / 2, altura - 3, (float)random.NextDouble());
+                piezas[3].transform.position = new Vector3(columnas / 2 + 1, altura - 3, (float)random.NextDouble());
             }
             else
             {
@@ -473,10 +475,10 @@ public class Tetris : MonoBehaviour
         {
             if (profundidad)
             {
-                piezas[0].transform.position = new Vector3(columnas / 2 - 1, altura - 1, 0);
-                piezas[1].transform.position = new Vector3(columnas / 2, altura - 1, 0.25f);
-                piezas[2].transform.position = new Vector3(columnas / 2 + 1, altura - 1, 0.25f);
-                piezas[3].transform.position = new Vector3(columnas / 2, altura - 2, 0);
+                piezas[0].transform.position = new Vector3(columnas / 2 - 1, altura - 1, (float)random.NextDouble());
+                piezas[1].transform.position = new Vector3(columnas / 2, altura - 1, (float)random.NextDouble());
+                piezas[2].transform.position = new Vector3(columnas / 2 + 1, altura - 1, (float)random.NextDouble());
+                piezas[3].transform.position = new Vector3(columnas / 2, altura - 2, (float)random.NextDouble());
             }
             else
             {
@@ -503,10 +505,10 @@ public class Tetris : MonoBehaviour
         {
             if (profundidad)
             {
-                piezas[0].transform.position = new Vector3(columnas / 2 - 1, altura - 1, 0);
-                piezas[1].transform.position = new Vector3(columnas / 2, altura - 1, 0.25f);
-                piezas[2].transform.position = new Vector3(columnas / 2 - 1, altura - 2, 0.25f);
-                piezas[3].transform.position = new Vector3(columnas / 2, altura - 2, 0);
+                piezas[0].transform.position = new Vector3(columnas / 2 - 1, altura - 1, (float)random.NextDouble());
+                piezas[1].transform.position = new Vector3(columnas / 2, altura - 1, (float)random.NextDouble());
+                piezas[2].transform.position = new Vector3(columnas / 2 - 1, altura - 2, (float)random.NextDouble());
+                piezas[3].transform.position = new Vector3(columnas / 2, altura - 2, (float)random.NextDouble());
             }
             else
             {
@@ -533,10 +535,10 @@ public class Tetris : MonoBehaviour
         {
             if (profundidad)
             {
-                piezas[0].transform.position = new Vector3(columnas / 2, altura - 1, 0);
-                piezas[1].transform.position = new Vector3(columnas / 2, altura - 2, 0.25f);
-                piezas[2].transform.position = new Vector3(columnas / 2, altura - 3, 0.25f);
-                piezas[3].transform.position = new Vector3(columnas / 2 - 1, altura - 3, 0);
+                piezas[0].transform.position = new Vector3(columnas / 2, altura - 1, (float)random.NextDouble());
+                piezas[1].transform.position = new Vector3(columnas / 2, altura - 2, (float)random.NextDouble());
+                piezas[2].transform.position = new Vector3(columnas / 2, altura - 3, (float)random.NextDouble());
+                piezas[3].transform.position = new Vector3(columnas / 2 - 1, altura - 3, (float)random.NextDouble());
             }
             else
             {
@@ -563,10 +565,10 @@ public class Tetris : MonoBehaviour
         {
             if (profundidad)
             {
-                piezas[0].transform.position = new Vector3(columnas / 2 + 1, altura - 1, 0);
-                piezas[1].transform.position = new Vector3(columnas / 2, altura - 1, 0.25f);
-                piezas[2].transform.position = new Vector3(columnas / 2, altura - 2, 0.25f);
-                piezas[3].transform.position = new Vector3(columnas / 2 - 1, altura - 2, 0);
+                piezas[0].transform.position = new Vector3(columnas / 2 + 1, altura - 1, (float)random.NextDouble());
+                piezas[1].transform.position = new Vector3(columnas / 2, altura - 1, (float)random.NextDouble());
+                piezas[2].transform.position = new Vector3(columnas / 2, altura - 2, (float)random.NextDouble());
+                piezas[3].transform.position = new Vector3(columnas / 2 - 1, altura - 2, (float)random.NextDouble());
             }
             else
             {

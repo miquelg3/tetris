@@ -38,7 +38,7 @@ public class Pieza : MonoBehaviour
             fila--;
             if (pieza != null)
             {
-                pieza.transform.position = new Vector3(columna, fila, 0);
+                pieza.transform.position = new Vector3(columna, fila, pieza.transform.position.z);
             }
         }
     }
